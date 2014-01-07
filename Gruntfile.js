@@ -1,10 +1,12 @@
+'use strict';
+
 // Generated on 2014-01-04 using generator-nodejs 0.0.7
 module.exports = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     complexity: {
       generic: {
-        src: ['app/**/*.js'],
+        src: ['index.js', 'lib/*.js'],
         options: {
           errorsOnly: false,
           cyclometric: 6,       // default is 3
@@ -17,7 +19,8 @@ module.exports = function (grunt) {
       all: [
         'Gruntfile.js',
         'app/**/*.js',
-        'test/**/*.js'
+        'test/**/*.js',
+        '*.js'
       ],
       options: {
         jshintrc: '.jshintrc'
