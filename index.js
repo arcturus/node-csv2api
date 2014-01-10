@@ -6,14 +6,15 @@
 // The storage is supported via levelDB
 
 var express = require('express'),
-    levelup = require('levelup');
+    levelup = require('levelup'),
+    csvloader = require('./lib/csvloader');
 
 var csv2api = (function csv2api() {
 
   var config, db;
 
-  var create = function create(options, csvPath) {
-
+  var create = function create(options, csvPath, cb) {
+    cvsloader.init(options, csvPath, cb);
   };
 
   var init = function init(cols, dbPath, port) {
