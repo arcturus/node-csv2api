@@ -1,0 +1,76 @@
+#!/usr/bin/env node
+
+var fs = require('fs');
+var colors = require('colors');
+var program = require('commander');
+var csv2api = require('..');
+
+var version = JSON.parse(
+  fs.readFileSync(__dirname + '/../package.json', 'utf8')).version;
+
+function list(val) {
+  return val.split(',').map(String);
+}
+
+function serve(cols, dbLocation, port) {
+  console.log('Starting server at port: '.green + port);
+  csv2api.init(cols, dbLocation, port);
+}
+
+program
+  .version(version)
+  .option('-c, --cols <cols>', 'columns to be used as keys (comman separated)', list)
+  .option('-l, --ldb <levelDB>', 'name of the lebelDB database [database]', 'database', 'String')
+  .option('-p, --port <port>', 'port to start the http server [3000]', parseInt, 3000);
+
+program
+  .command('create <csvfile>')
+  .description('Generates the levelDB file from the csv')
+  .option('-s, --serve', 'start the api once the database is created')
+  .action(function(csvfile, options) {
+    var errors = [];
+    if (!program.cols) {
+      errors.push('Specify the columsn to use as keys with the paratemer --cols'.red);
+    }
+    if (!program.ldb) {
+      errors.push('Specify the levelDB database target with parameter --ldb'.red);
+    }
+    if (errors.length > 0) {
+      errors.forEach(function(e) {
+        console.log(e);
+      });
+      process.exit(1);
+    }
+    console.log('Generating levelDB database'.green);
+    var options = {
+      keys: program.cols,
+      db: program.ldb
+    };
+    
+    csv2api.create(options, csvfile, function() {
+      console.log('Db created'.green);
+      if (options.serve) {
+        serve(program.cols, program.ldb, program.port);
+      }
+    });
+  });
+
+program
+  .command('serve')
+  .description('Launch an http service to serve the content with the specified columns as get parameters')
+  .option('-l, --ldb <levelDB>', 'name of the lebelDB database', 'database', 'String')
+  .action(function(options) {
+    if (!program.cols) {
+      console.log('Specify the columsn to use as keys with the paratemer --cols'.red);
+      process.exit(1);
+    }
+    var ldb = program.ldb || options.ldb;
+    console.log(program.cols + ',' + ldb + ',' + program.port);
+    serve(program.cols, ldb, program.port);
+  });
+
+program.parse(process.argv);
+
+if (process.argv.length == 2) {
+  program.help();
+}
