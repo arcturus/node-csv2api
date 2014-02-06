@@ -32,3 +32,7 @@ For serving the content just do:
 
 Then go to:
 `http://localhost:3000/?email=<email>`
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/arcturus/node-csv2api/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
